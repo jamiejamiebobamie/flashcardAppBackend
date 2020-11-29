@@ -12,6 +12,8 @@ from dotenv import load_dotenv
 
 import json
 
+from functools import reduce
+
 import pymongo
 from pymongo import MongoClient
 # MONGO_URI = str(os.environ.get('MONGO_URI'))
@@ -98,7 +100,7 @@ subjects = {"tabs":
 @app.route('/')
 def _main():
     # create cardstacks collection and add cards to them
-    # (Should each Domain have its own collection?)
+    # (Should each Domain have its own collection? Faster?)
     db = mongo.db
     collection = db.cardstacks
     for i in range(len(flashcards["cards"])):
@@ -123,22 +125,14 @@ def _main():
 def testAPI_cards():
     db = mongo.db
     collection = db.cardstacks
-
     # get the subject data from the returned request
     subject_data = request.get_json()
-    print(subject_data)
-
-    # create a lookup dictionary
-    LOOKUP = {0:"Domain",1:"Subdomain",2:"Topic",3:"Match"}
-
     # iterate through the subject_data
     filtered_cards = []
     for string in subject_data:
         # each subject_data entry is a string separated by '*' of:
-        # Domain*Subdomain*Topic
+        # 'Domain*Subdomain*Topic'
         terms_to_match = string.split("*")
-        # Future: Pull from the database the correct cardstacks based on the
-            # terms_to_match: ['Domain', 'Subdomain', 'Topic'.
         cards = collection.find({
             "Domain":terms_to_match[0],
             "Subdomain":terms_to_match[1],
@@ -146,6 +140,9 @@ def testAPI_cards():
             })
         if cards:
             for card in cards:
+                # probably a better way to do this, but remove the object id
+                    # from the card object as this throws an error when trying
+                    # to return filtered_cards as JSON.
                 card = {
                         "Domain" : card["Domain"],
                         "Subdomain" : card["Subdomain"],
@@ -153,22 +150,27 @@ def testAPI_cards():
                         "front" : card["front"],
                         "back" : card["back"]
                         }
+                # add the card object to the filtered_cards array
                 filtered_cards.append(card)
-        # Presently: iterate through the simulated card array and append to the
-            # filtered_cards array
-        # i = 0
-        # for card in flashcards["cards"]:
-        #     while i < 3 and terms_to_match[i] == card.get(LOOKUP[i],None):
-        #         i+=1
-        #     if i == 3:
-        #         filtered_cards.append(card)
-        #     i = 0
     # return the filtered cards to the frontend.
-    print(filtered_cards)
-    return {"cards":filtered_cards}
+    return { "cards": filtered_cards }
 
 @app.route('/api/v1/test/tabs')
 def testAPI_tabs():
+    # future: query database and create subject_tabs_array formatted like the above 'subjects' array
+    # need to
+    db = mongo.db
+    collection = db.cardstacks
+    # https://www.objectrocket.com/blog/how-to/get-keys-mongodb-collection/
+    # this finds all keys associated with the objects in my database:
+        # {'Domain', '_id', 'back', 'Subdomain', 'front', 'Topic'}
+    # need to find all entries of these keys
+        # find all domain entries > then all Subdomains of a Domain > then all
+        # topics of these Subdomains.
+    idk = reduce( lambda all_keys, rec_keys: all_keys | set(rec_keys), map(lambda d: d.keys(), db.cardstacks.find()), set() )
+    print(idk)
+
+    # right now: returning subjects array
     return subjects
 
 if __name__ == '__main__':
