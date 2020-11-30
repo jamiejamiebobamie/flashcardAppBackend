@@ -1,13 +1,13 @@
 import os
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, redirect, request, url_for
 app = Flask(__name__)
 
 from flask_cors import CORS, cross_origin
 # public API, allow all requests *
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-import requests
+# import requests
 from dotenv import load_dotenv
 
 import json
@@ -103,29 +103,101 @@ subjects = {"tabs":
 ]
 }
 
-@app.route('/')
-def _main():
+@app.route('/',methods=['GET'])
+def _main_get():
     # create cardstacks collection and add cards to them
     # (Should each Domain have its own collection? Faster?)
+    # db = mongo.db
+    # collection = db.cardstacks
+    # for i in range(len(flashcards["cards"])):
+    #     Domain = flashcards["cards"][i]["Domain"]
+    #     Subdomain = flashcards["cards"][i]["Subdomain"]
+    #     Topic = flashcards["cards"][i]["Topic"]
+    #     front = flashcards["cards"][i]["front"]
+    #     back = flashcards["cards"][i]["back"]
+    #     new_document = {
+    #         "Domain" : Domain,
+    #         "Subdomain" : Subdomain,
+    #         "Topic" : Topic,
+    #         "front" : front,
+    #         "back" : back
+    #         }
+    #     print(new_document)
+    #     collection.insert_one(new_document)
+
+    return render_template('index.html', Domain='', Subdomain='', Topic='')
+
+# @app.route('/?Inserted=True&Domain=j&Subdomain=j&Topic=j')
+@app.route('/',methods=['POST'])
+def _main_post():
+    # create cardstacks collection and add cards to them
+    # (Should each Domain have its own collection? Faster?)
+    # db = mongo.db
+    # collection = db.cardstacks
+    # for i in range(len(flashcards["cards"])):
+    #     Domain = flashcards["cards"][i]["Domain"]
+    #     Subdomain = flashcards["cards"][i]["Subdomain"]
+    #     Topic = flashcards["cards"][i]["Topic"]
+    #     front = flashcards["cards"][i]["front"]
+    #     back = flashcards["cards"][i]["back"]
+    #     new_document = {
+    #         "Domain" : Domain,
+    #         "Subdomain" : Subdomain,
+    #         "Topic" : Topic,
+    #         "front" : front,
+    #         "back" : back
+    #         }
+    #     print(new_document)
+    #     collection.insert_one(new_document)
+    print('heheyheye',request.form)
+
+    Domain = request.form.getlist('Domain')[0]
+    Subdomain = request.form.getlist('Subdomain')[0]
+    Topic = request.form.getlist('Topic')[0]
+    front = request.form.getlist('front')[0]
+    back = request.form.getlist('back')[0]
+
+    # return render_template('index.html', Inserted=False, Domain='', Subdomain='', Topic='')
+    return render_template('index.html', Inserted=True, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
+
+@app.route('/add',methods=['POST'])
+def add_cards():
+
     db = mongo.db
-    collection = db.cardstacks
-    for i in range(len(flashcards["cards"])):
-        Domain = flashcards["cards"][i]["Domain"]
-        Subdomain = flashcards["cards"][i]["Subdomain"]
-        Topic = flashcards["cards"][i]["Topic"]
-        front = flashcards["cards"][i]["front"]
-        back = flashcards["cards"][i]["back"]
+    cardstacks = db.cardstacks
+
+    print('form',request.form)
+
+    Domain = request.form.getlist('Domain')[0]
+    Subdomain = request.form.getlist('Subdomain')[0]
+    Topic = request.form.getlist('Topic')[0]
+    front = request.form.getlist('front')[0]
+    back = request.form.getlist('back')[0]
+
+    all_fields_contain_content = (len(Domain) and
+                                 len(Subdomain) and
+                                 len(Topic) and
+                                 len(front) and
+                                 len(back))
+    if all_fields_contain_content:
         new_document = {
             "Domain" : Domain,
             "Subdomain" : Subdomain,
             "Topic" : Topic,
             "front" : front,
             "back" : back
-            }
+        }
         print(new_document)
-        collection.insert_one(new_document)
-    print(db.cardstacks.find())
-    return render_template('index.html', title='Home',flashcards=flashcards)
+        return_document = cardstacks.insert_one(new_document)
+        inserted_ok = return_document.acknowledged
+        print(inserted_ok)
+    else:
+        inserted_ok = False
+        request.form
+    # params = {'Inserted':str(inserted_ok), 'Domain':Domain, 'Subdomain':Subdomain, 'Topic':Topic}
+
+    return redirect(url_for('._main_post'), code=307)
+    # return render_template('index.html', Inserted=inserted_ok, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
 
 @app.route('/api/v1/cards',methods=['POST'])
 def query_cards():
