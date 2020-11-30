@@ -54,7 +54,13 @@ flashcards = {"cards": [{
         "Subdomain" : "Unity",
         "Topic" : "UI",
         "front" : "the front4",
-        "back" : "the back4" }
+        "back" : "the back4" },
+        {
+        "Domain" : "Alcohol",
+        "Subdomain" : "Beer",
+        "Topic" : "German",
+        "front" : "woah",
+        "back" : "yay" }
     ]}
 
 subjects = {"tabs":
@@ -121,28 +127,30 @@ def _main():
     print(db.cardstacks.find())
     return render_template('index.html', title='Home',flashcards=flashcards)
 
-@app.route('/api/v1/test/cards',methods=['POST'])
-def testAPI_cards():
+@app.route('/api/v1/cards',methods=['POST'])
+def query_cards():
     db = mongo.db
-    collection = db.cardstacks
-    # get the subject data from the returned request
+    cardstacks = db.cardstacks
+    # get the subject_data from the returned request.
+    # this contains which subjects the user wants flashcards on.
     subject_data = request.get_json()
-    # iterate through the subject_data
     filtered_cards = []
+    # iterate through the subject_data
     for string in subject_data:
         # each subject_data entry is a string separated by '*' of:
         # 'Domain*Subdomain*Topic'
         terms_to_match = string.split("*")
-        cards = collection.find({
+        cards = cardstacks.find({
             "Domain":terms_to_match[0],
             "Subdomain":terms_to_match[1],
             "Topic":terms_to_match[2],
             })
         if cards:
             for card in cards:
-                # probably a better way to do this, but remove the object id
-                    # from the card object as this throws an error when trying
-                    # to return filtered_cards as JSON.
+                # probably a better way to do this, but create a new card object
+                    # that does not contain the object id from the database
+                    # as this throws an error when returning the filtered_cards
+                    # as JSON.
                 card = {
                         "Domain" : card["Domain"],
                         "Subdomain" : card["Subdomain"],
@@ -150,28 +158,39 @@ def testAPI_cards():
                         "front" : card["front"],
                         "back" : card["back"]
                         }
-                # add the card object to the filtered_cards array
+                # add the new card object to the filtered_cards array
                 filtered_cards.append(card)
     # return the filtered cards to the frontend.
     return { "cards": filtered_cards }
 
-@app.route('/api/v1/test/tabs')
-def testAPI_tabs():
-    # future: query database and create subject_tabs_array formatted like the above 'subjects' array
-    # need to
+@app.route('/api/v1/tabs')
+def query_tabs():
     db = mongo.db
-    collection = db.cardstacks
-    # https://www.objectrocket.com/blog/how-to/get-keys-mongodb-collection/
-    # this finds all keys associated with the objects in my database:
-        # {'Domain', '_id', 'back', 'Subdomain', 'front', 'Topic'}
-    # need to find all entries of these keys
-        # find all domain entries > then all Subdomains of a Domain > then all
-        # topics of these Subdomains.
-    idk = reduce( lambda all_keys, rec_keys: all_keys | set(rec_keys), map(lambda d: d.keys(), db.cardstacks.find()), set() )
-    print(idk)
+    cardstacks = db.cardstacks
+    # find all Domain types in the database >
+        # then all Subdomains of each Domain > then all topics of each
+        # Subdomain.
+    # create the appropriate data structure for the frontend so users can query
+        # the database with the specific topics they want to study.
+    tabs = []
+    all_domains = cardstacks.distinct('Domain')
+    for i, each_domain in enumerate(all_domains):
+        tabs.append({'tabName':each_domain,'content':[]})
+        all_subdomains_of_this_domain = cardstacks.find({
+                                            "Domain":
+                                            each_domain }).distinct('Subdomain')
+        for j, each_subdomain in enumerate(all_subdomains_of_this_domain):
+            tabs[i]['content'].append({'tabName':each_subdomain,'content':[]})
+            all_topics_of_this_subdomains = cardstacks.find({
+                                                "Domain":
+                                                each_domain,
+                                                "Subdomain":
+                                                each_subdomain,
+                                                }).distinct('Topic')
+            for each_topic in all_topics_of_this_subdomains:
+                tabs[i]['content'][j]['content'].append({'tabName':each_topic})
 
-    # right now: returning subjects array
-    return subjects
+    return {'tabs':tabs}
 
 if __name__ == '__main__':
     port = os.getenv("PORT", 7000)
