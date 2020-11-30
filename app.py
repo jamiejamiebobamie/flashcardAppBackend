@@ -15,8 +15,9 @@ from functools import reduce
 
 import pymongo
 from pymongo import MongoClient
-# MONGO_URI = str(os.environ.get('MONGO_URI'))
-mongo = MongoClient('mongodb://127.0.0.1:27017')
+MONGO_URI = str(os.environ.get('MONGO_URI'))
+# mongo = MongoClient('mongodb://127.0.0.1:27017')
+mongo = MongoClient(MONGO_URI)
 
 flashcards = {"cards": [{
         "Domain" : "Programming languages",
@@ -242,5 +243,5 @@ def query_tabs():
 
 if __name__ == '__main__':
     port = os.getenv("PORT", 7000)
-    app.run(host = '0.0.0.0', port = int(port), debug=True)
-    # app.run() // might need this if heroku doesn't want me to specify the port.
+    # app.run(host = '0.0.0.0', port = int(port), debug=True)
+    app.run() # might need this if heroku doesn't want me to specify the port.
