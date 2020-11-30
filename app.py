@@ -1,13 +1,12 @@
 import os
 
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, render_template, redirect, request, url_for, make_response
 app = Flask(__name__)
 
 from flask_cors import CORS, cross_origin
 # public API, allow all requests *
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-# import requests
 from dotenv import load_dotenv
 
 import json
@@ -124,12 +123,21 @@ def _main_get():
     #         }
     #     print(new_document)
     #     collection.insert_one(new_document)
+    is_logged_in = request.cookies.get('loggedin?')
+    if is_logged_in == 'True':
+        return render_template('index.html', Domain='', Subdomain='', Topic='')
+    else:
+        return render_template('login.html')
 
-    return render_template('index.html', Domain='', Subdomain='', Topic='')
+@app.route('/login',methods=['post'])
+def login():
+    print('form',request.form)
+    password = request.form.getlist('password')[0]
+    logged_in = password == str(os.environ.get('password'))
+    # return redirect(url_for('._main_post'), code=307)
+    response = make_response(redirect(url_for('._main_get')))
+    response.set_cookie('loggedin?', str(logged_in))
 
-# @app.route('/?Inserted=True&Domain=j&Subdomain=j&Topic=j')
-@app.route('/',methods=['POST'])
-def _main_post():
     # create cardstacks collection and add cards to them
     # (Should each Domain have its own collection? Faster?)
     # db = mongo.db
@@ -149,16 +157,57 @@ def _main_post():
     #         }
     #     print(new_document)
     #     collection.insert_one(new_document)
-    print('heheyheye',request.form)
+    return response
+    # return render_template('index.html', Domain='', Subdomain='', Topic='')
 
-    Domain = request.form.getlist('Domain')[0]
-    Subdomain = request.form.getlist('Subdomain')[0]
-    Topic = request.form.getlist('Topic')[0]
-    front = request.form.getlist('front')[0]
-    back = request.form.getlist('back')[0]
+# @app.route('/?Inserted=True&Domain=j&Subdomain=j&Topic=j')
+@app.route('/',methods=['POST'])
+def _main_post():
+    print('hi')
+    is_logged_in = request.cookies.get('loggedin?')
+    print(is_logged_in)
+    if is_logged_in == 'True':
+        print('heheyheye',request.form)
 
-    # return render_template('index.html', Inserted=False, Domain='', Subdomain='', Topic='')
-    return render_template('index.html', Inserted=True, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
+        Domain = request.form.getlist('Domain')[0]
+        Subdomain = request.form.getlist('Subdomain')[0]
+        Topic = request.form.getlist('Topic')[0]
+        front = request.form.getlist('front')[0]
+        back = request.form.getlist('back')[0]
+
+        # Inserted is always True atm...
+        return render_template('index.html', Inserted=True, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
+    else:
+        return render_template('login.html')
+    # create cardstacks collection and add cards to them
+    # (Should each Domain have its own collection? Faster?)
+    # db = mongo.db
+    # collection = db.cardstacks
+    # for i in range(len(flashcards["cards"])):
+    #     Domain = flashcards["cards"][i]["Domain"]
+    #     Subdomain = flashcards["cards"][i]["Subdomain"]
+    #     Topic = flashcards["cards"][i]["Topic"]
+    #     front = flashcards["cards"][i]["front"]
+    #     back = flashcards["cards"][i]["back"]
+    #     new_document = {
+    #         "Domain" : Domain,
+    #         "Subdomain" : Subdomain,
+    #         "Topic" : Topic,
+    #         "front" : front,
+    #         "back" : back
+    #         }
+    #     print(new_document)
+    #     collection.insert_one(new_document)
+    # print('heheyheye',request.form)
+    #
+    # Domain = request.form.getlist('Domain')[0]
+    # Subdomain = request.form.getlist('Subdomain')[0]
+    # Topic = request.form.getlist('Topic')[0]
+    # front = request.form.getlist('front')[0]
+    # back = request.form.getlist('back')[0]
+    #
+    # # return render_template('index.html', Inserted=False, Domain='', Subdomain='', Topic='')
+    # return render_template('index.html', Inserted=True, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
 
 @app.route('/add',methods=['POST'])
 def add_cards():
