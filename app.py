@@ -70,6 +70,7 @@ def add_cards():
                                  len(Topic) and
                                  len(front) and
                                  len(back))
+    inserted_ok = False
     if all_fields_contain_content:
         new_document = {
             "Domain" : Domain,
@@ -80,9 +81,8 @@ def add_cards():
         }
         return_document = cardstacks.insert_one(new_document)
         inserted_ok = return_document.acknowledged
-    else:
-        inserted_ok = False
-        request.form.set("inserted",inserted_ok)
+
+    request.form.set("inserted",inserted_ok)
 
     return redirect(url_for('._main_post'), code=307)
 
