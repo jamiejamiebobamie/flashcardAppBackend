@@ -46,6 +46,7 @@ def logout():
 def _main_post():
     is_logged_in = request.cookies.get('loggedin?')
     if is_logged_in == str(os.environ.get('is_logged_in')):
+        print(request.form.getlist('Domain'))
         Domain = " ".join(request.form.getlist('Domain'))
         Subdomain = " ".join(request.form.getlist('Subdomain'))
         Topic = " ".join(request.form.getlist('Topic'))
@@ -65,7 +66,6 @@ def add_cards():
 
     db = mongo.db
     cardstacks = db.cardstacks
-    print(request.form.getlist('Domain'),request.form.getlist('Domain')[0])
     Domain = request.form.getlist('Domain')[0]
     Subdomain = request.form.getlist('Subdomain')[0]
     Topic = request.form.getlist('Topic')[0]
