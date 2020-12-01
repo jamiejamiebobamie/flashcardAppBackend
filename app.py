@@ -38,11 +38,8 @@ def login():
 
 @app.route('/logout',methods=['get'])
 def logout():
-    password = request.form.getlist('password')[0]
-    password_matches = password == str(os.environ.get('password'))
-    response = make_response(redirect(url_for('._main_get')))
-    if password_matches:
-        response.set_cookie('loggedin?', 'nope')
+    response = make_response(render_template('login.html'))
+    response.set_cookie('loggedin?', 'nope')
     return response
 
 @app.route('/',methods=['POST'])
