@@ -36,7 +36,7 @@ def login():
         response.set_cookie('loggedin?', str(os.environ.get('is_logged_in')))
     return response
 
-@app.route('/login',methods=['post'])
+@app.route('/logout',methods=['get'])
 def logout():
     password = request.form.getlist('password')[0]
     password_matches = password == str(os.environ.get('password'))
