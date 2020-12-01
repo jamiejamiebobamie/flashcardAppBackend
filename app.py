@@ -46,7 +46,9 @@ def _main_post():
         front = request.form.getlist('front')[0]
         back = request.form.getlist('back')[0]
 
-        inserted_ok = request.headers.get('inserted')
+        # right now inserted_ok is always True
+        # inserted_ok = request.headers.get('inserted')
+        inserted_ok = True
 
         return render_template('index.html', Inserted=inserted_ok, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
     else:
@@ -81,7 +83,8 @@ def add_cards():
         return_document = cardstacks.insert_one(new_document)
         inserted_ok = return_document.acknowledged
 
-    request.headers.set("inserted", inserted_ok)
+    # need to find a way to send along the status of the insertion to _main_post
+    # request.headers.set("inserted", inserted_ok)
 
     return redirect(url_for('._main_post'), code=307)
 
