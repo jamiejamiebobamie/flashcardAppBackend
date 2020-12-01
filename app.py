@@ -81,7 +81,7 @@ def add_cards():
         return_document = cardstacks.insert_one(new_document)
         inserted_ok = return_document.acknowledged
 
-    request.headers["inserted"] = inserted_ok
+    request.headers.set("inserted", inserted_ok)
 
     return redirect(url_for('._main_post'), code=307)
 
