@@ -46,16 +46,16 @@ def logout():
 def _main_post():
     is_logged_in = request.cookies.get('loggedin?')
     if is_logged_in == str(os.environ.get('is_logged_in')):
-        print(request.form.getlist('Domain'))
-        Domain = " ".join(request.form.getlist('Domain'))
-        Subdomain = " ".join(request.form.getlist('Subdomain'))
-        Topic = " ".join(request.form.getlist('Topic'))
+        Domain = request.form.getlist('Domain')[0]
+        Subdomain = request.form.getlist('Subdomain')[0]
+        Topic = request.form.getlist('Topic')[0]
         front = request.form.getlist('front')[0]
         back = request.form.getlist('back')[0]
 
         # right now inserted_ok is always True
         # inserted_ok = request.headers.get('inserted')
         inserted_ok = True
+        print(Domain, Subdomain, Topic)
 
         return render_template('index.html', Inserted=inserted_ok, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
     else:
