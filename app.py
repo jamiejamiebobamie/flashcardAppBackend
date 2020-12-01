@@ -42,7 +42,7 @@ def logout():
     password_matches = password == str(os.environ.get('password'))
     response = make_response(redirect(url_for('._main_get')))
     if password_matches:
-        response.set_cookie('loggedin?', "nope"))
+        response.set_cookie('loggedin?', 'nope')
     return response
 
 @app.route('/',methods=['POST'])
