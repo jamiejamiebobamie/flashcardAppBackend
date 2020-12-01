@@ -36,13 +36,22 @@ def login():
         response.set_cookie('loggedin?', str(os.environ.get('is_logged_in')))
     return response
 
+@app.route('/login',methods=['post'])
+def logout():
+    password = request.form.getlist('password')[0]
+    password_matches = password == str(os.environ.get('password'))
+    response = make_response(redirect(url_for('._main_get')))
+    if password_matches:
+        response.set_cookie('loggedin?', "nope"))
+    return response
+
 @app.route('/',methods=['POST'])
 def _main_post():
     is_logged_in = request.cookies.get('loggedin?')
     if is_logged_in == str(os.environ.get('is_logged_in')):
-        Domain = request.form.getlist('Domain')[0]
-        Subdomain = request.form.getlist('Subdomain')[0]
-        Topic = request.form.getlist('Topic')[0]
+        Domain = request.form.getlist('Domain').join(" ")
+        Subdomain = request.form.getlist('Subdomain').join(" ")
+        Topic = request.form.getlist('Topic').join(" ")
         front = request.form.getlist('front')[0]
         back = request.form.getlist('back')[0]
 
