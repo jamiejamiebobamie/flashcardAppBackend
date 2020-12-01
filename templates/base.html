@@ -11,11 +11,11 @@
             style ='display:flex;flex-direction:column;justify-content:space-around;height:50%; width: 50%;align-self:center;margin-left:auto;margin-right:auto;margin-top:100px;margin-bottom:auto;min-width:500px;max-width:900px;'
             action="/add" method="post">
             <label for="Domain">Domain:</label>
-            <input tabindex="1" type="text" id="Domain"  name="Domain" value={{Domain}}>
+            <input tabindex="1" type="text" id="Domain"  name="Domain" value="{{Domain}}">
             <label for="Subdomain">Subdomain:</label>
-            <input tabindex="2" type="text" id="Subdomain" name="Subdomain" value={{Subdomain}} >
+            <input tabindex="2" type="text" id="Subdomain" name="Subdomain" value="{{Subdomain}}">
             <label for="Topic">Topic:</label>
-            <input tabindex="3" type="text" id="Topic" name="Topic" value={{Topic}}>
+            <input tabindex="3" type="text" id="Topic" name="Topic" value="{{Topic}}">
             <label for="front">Front of Card:</label>
             <input autofocus tabindex="4" type="text" id="front" name="front">
             <label for="back">Back of Card:</label>
@@ -24,17 +24,16 @@
         </form>
         <h1 style ='display:flex;flex-direction:column;text-align:center;justify-content:center; width: 50%;align-self:center;margin-left:auto;margin-right:auto;margin-top:50px;margin-bottom:auto;min-width:500px;max-width:900px;'
         >Last submission successful.</h1>
-        <p>{{Domain}}</p>
         {% else %}
         <form
             style ='display:flex;flex-direction:column;justify-content:space-around;height:50%; width: 50%;align-self:center;margin-left:auto;margin-right:auto;margin-top:100px;margin-bottom:auto;min-width:500px;max-width:900px;'
             action="/add" method="post">
                     <label for="Domain">Domain:</label>
-                    <input autofocus tabindex="1" type="text" id="Domain" name="Domain" value={{Domain}}>
+                    <input autofocus tabindex="1" type="text" id="Domain" name="Domain">
                     <label for="Subdomain">Subdomain:</label>
-                    <input tabindex="2" type="text" id="Subdomain" name="Subdomain" value={{Subdomain}} >
+                    <input tabindex="2" type="text" id="Subdomain" name="Subdomain">
                     <label for="Topic">Topic:</label>
-                    <input tabindex="3" type="text" id="Topic" name="Topic" value={{Topic}}>
+                    <input tabindex="3" type="text" id="Topic" name="Topic">
                     <label for="front">Front of Card:</label>
                     <input tabindex="4" type="text" id="front" name="front">
                     <label for="back">Back of Card:</label>

@@ -55,7 +55,6 @@ def _main_post():
         # right now inserted_ok is always True
         # inserted_ok = request.headers.get('inserted')
         inserted_ok = True
-        print(Domain, Subdomain, Topic)
 
         return render_template('index.html', Inserted=inserted_ok, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
     else:
