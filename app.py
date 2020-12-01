@@ -46,7 +46,7 @@ def _main_post():
         front = request.form.getlist('front')[0]
         back = request.form.getlist('back')[0]
 
-        inserted_ok = request.form.get('inserted')
+        inserted_ok = request.headers.get('inserted')
 
         return render_template('index.html', Inserted=inserted_ok, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
     else:
@@ -81,7 +81,7 @@ def add_cards():
         return_document = cardstacks.insert_one(new_document)
         inserted_ok = return_document.acknowledged
 
-    request.form["inserted"] = inserted_ok
+    request.headers["inserted"] = inserted_ok
 
     return redirect(url_for('._main_post'), code=307)
 
