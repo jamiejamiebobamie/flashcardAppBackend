@@ -19,123 +19,37 @@ MONGO_URI = str(os.environ.get('MONGO_URI'))
 # mongo = MongoClient('mongodb://127.0.0.1:27017')
 mongo = MongoClient(MONGO_URI)
 
-flashcards = {"cards": [{
-        "Domain" : "Programming languages",
-        "Subdomain" : "C++",
-        "Topic" : "Operators",
-        "front" : "the front1",
-        "back" : "the back1" },
-        {
-        "Domain" : "Programming languages",
-        "Subdomain" : "C++",
-        "Topic" : "Operators",
-        "front" : "the front1a",
-        "back" : "the back1b" },
-        {
-        "Domain" : "Programming languages",
-        "Subdomain" : "C++",
-        "Topic" : "Operators",
-        "front" : "the front1aa",
-        "back" : "the back1bb" },
-        {
-        "Domain" : "Programming languages",
-        "Subdomain" : "C#",
-        "Topic" : "Garbage collection",
-        "front" : "the front2",
-        "back" : "the back2" },
-        {
-        "Domain" : "Programming languages",
-        "Subdomain" : "Python",
-        "Topic" : "Decorators",
-        "front" : "the front3",
-        "back" : "the back3" },
-        {
-        "Domain" : "Game engines",
-        "Subdomain" : "Unity",
-        "Topic" : "UI",
-        "front" : "the front4",
-        "back" : "the back4" },
-        {
-        "Domain" : "Alcohol",
-        "Subdomain" : "Beer",
-        "Topic" : "German",
-        "front" : "woah",
-        "back" : "yay" }
-    ]}
-
-subjects = {"tabs":
-[
-{ 'tabName': "Programming languages", 'content':
-[
-{
-'tabName':"C++",
-'content': [
-{'tabName':"Operators"},
-{'tabName':"Variables"}
-]
-},
-{
-'tabName':"Python",
-'content': [
-{'tabName':"Decorators"},
-{'tabName':"Classes"}
-]
-},
-{
-'tabName':"C#",
-'content': [
-{'tabName':"Garbage collection"},
-{'tabName':"Variables"}
-]
-},
-]
-},
-{ 'tabName': "Game engines", 'content':
-[
-{
-'tabName':"Unity",
-'content': [
-{'tabName':"UI"},
-]
-},
-]
-}
-]
-}
-
 @app.route('/',methods=['GET'])
 def _main_get():
     is_logged_in = request.cookies.get('loggedin?')
-    if is_logged_in == 'True':
+    if is_logged_in == str(os.environ.get('is_logged_in')):
         return render_template('index.html', Domain='', Subdomain='', Topic='')
     else:
         return render_template('login.html')
 
 @app.route('/login',methods=['post'])
 def login():
-    print('form',request.form)
     password = request.form.getlist('password')[0]
-    logged_in = password == str(os.environ.get('password'))
+    password_matches = password == str(os.environ.get('password'))
     response = make_response(redirect(url_for('._main_get')))
-    response.set_cookie('loggedin?', str(logged_in))
+    if password_matches:
+        response.set_cookie('loggedin?', str(os.environ.get('is_logged_in')))
     return response
 
 @app.route('/',methods=['POST'])
 def _main_post():
-    print('hi')
     is_logged_in = request.cookies.get('loggedin?')
-    print(is_logged_in)
-    if is_logged_in == 'True':
-        print('heheyheye',request.form)
-
+    if is_logged_in == str(os.environ.get('is_logged_in')):
         Domain = request.form.getlist('Domain')[0]
         Subdomain = request.form.getlist('Subdomain')[0]
         Topic = request.form.getlist('Topic')[0]
         front = request.form.getlist('front')[0]
         back = request.form.getlist('back')[0]
 
+        inserted_ok = request.form.getlist('inserted')[0]
+
         # 'Inserted' is always True atm...
-        return render_template('index.html', Inserted=True, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
+        return render_template('index.html', Inserted=inserted_ok, Domain=Domain, Subdomain=Subdomain, Topic=Topic)
     else:
         return render_template('login.html')
 
@@ -144,8 +58,6 @@ def add_cards():
 
     db = mongo.db
     cardstacks = db.cardstacks
-
-    print('form',request.form)
 
     Domain = request.form.getlist('Domain')[0]
     Subdomain = request.form.getlist('Subdomain')[0]
@@ -166,13 +78,11 @@ def add_cards():
             "front" : front,
             "back" : back
         }
-        print(new_document)
         return_document = cardstacks.insert_one(new_document)
         inserted_ok = return_document.acknowledged
-        print(inserted_ok)
     else:
         inserted_ok = False
-        request.form
+        request.form.set("inserted",inserted_ok)
 
     return redirect(url_for('._main_post'), code=307)
 
