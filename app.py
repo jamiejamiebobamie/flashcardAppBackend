@@ -170,6 +170,7 @@ def get_flashcards():
                         front = flashcard[0]
                         # strip the leading space.
                         back = content[1:]
+                        print(Domain,Subdomain,Topic,front,back)
                         inserted_ok = add_card_to_db(Domain,Subdomain,Topic,front,back)
                         insertion_statuses.append(inserted_ok)
                         flashcard = []
