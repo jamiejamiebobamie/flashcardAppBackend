@@ -153,7 +153,7 @@ def get_flashcards():
 
             flashcard_documents = []
             front = None
-            print('test')
+            print(terms_defs,soup)
             if terms_defs:
                 print('test2')
                 for i in range(len(terms_defs)):
