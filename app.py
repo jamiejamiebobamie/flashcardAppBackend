@@ -141,7 +141,10 @@ def get_flashcards():
                 'User-Agent': 'My User Agent 1.0',
                 'From': 'youremail@domain.com'  # This is another valid field
             }
-            page = s.get(url,headers=headers)
+            cookies = parse_cookies()
+            for k,v in cookies.items():
+                s.cookies.set(k,v)
+            page = s.get(url,headers=headers, cookies=cookies)
             soup = BeautifulSoup(page.content, 'html.parser')
             """
             FROM QUIZLET:
