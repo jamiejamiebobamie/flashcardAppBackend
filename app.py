@@ -151,24 +151,25 @@ def get_flashcards():
             terms_defs = soup.findAll("span", {"class": "TermText notranslate lang-en"})
 
             flashcard = []
-            # flashcards = []
             insertion_statuses = []
-
             if terms_defs:
                 for i in range(len(terms_defs)):
                     terms_defs[i] = terms_defs[i].prettify()
                     # grab the content between the <span></span> tags
-                    content = terms_defs[i].split("\n")[1]
+                    content = terms_defs[i].split("\n")[1:-1]
+                    if len(content)>1:
+                        content = [c for c in content if c != ' <br/>']
+                    content = "".join(content)
+                    # print(content)
                     if not len(flashcard):
                         # need to do more testing, but it appears there is a leading
-                            # space in front of the terms and defintions that needs
+                            # space in front of the terms and definitions that needs
                             # to be stripped.
                         flashcard.append(content[1:])
                     else:
                         front = flashcard[0]
                         # strip the leading space.
                         back = content[1:]
-                        # flashcards.append((front,back))
                         inserted_ok = add_card_to_db(Domain,Subdomain,Topic,front,back)
                         insertion_statuses.append(inserted_ok)
                         flashcard = []
@@ -176,13 +177,40 @@ def get_flashcards():
     else:
         return render_template('login.html')
 
-# @app.route('/deleteStack',methods=['DELETE'])
-# def delete_cardstack():
-#     is_logged_in = request.cookies.get('loggedin?')
-#     if is_logged_in == str(os.environ.get('is_logged_in')):
-#         return render_template('quizlet.html')
-#     else:
-#         return render_template('login.html')
+@app.route('/delete',methods=['GET'])
+def get_delete_form():
+    is_logged_in = request.cookies.get('loggedin?')
+    if is_logged_in == str(os.environ.get('is_logged_in')):
+        return render_template('delete.html')
+    else:
+        return render_template('login.html')
+
+@app.route('/delete',methods=['POST'])
+def submit_delete_form():
+    is_logged_in = request.cookies.get('loggedin?')
+    if is_logged_in == str(os.environ.get('is_logged_in')):
+
+        Domain = request.form.getlist('Domain')[0]
+        Subdomain = request.form.getlist('Subdomain')[0]
+        Topic = request.form.getlist('Topic')[0]
+        # print(Domain,Subdomain,Topic)
+
+        all_fields_contain_content = (len(Domain) and
+                                     len(Subdomain) and
+                                     len(Topic))
+        if all_fields_contain_content:
+            db = mongo.db
+            cardstacks = db.cardstacks
+            print(Domain,Subdomain,Topic)
+            d = cardstacks.delete_many( {
+                   "Domain":Domain,
+                   "Subdomain":Subdomain,
+                   "Topic":Topic,
+                   } )
+            print(d.deleted_count)
+        return render_template('delete.html')
+    else:
+        return render_template('login.html')
 
 @app.route('/api/v1/cards',methods=['POST'])
 def query_cards():
