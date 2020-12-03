@@ -16,15 +16,15 @@
             style ='display:flex;flex-direction:column;justify-content:space-around;height:50%; width: 50%;align-self:center;margin-left:auto;margin-right:auto;margin-top:100px;margin-bottom:auto;min-width:500px;max-width:900px;'
             action="/quizlet" method="post">
             <label for="Domain">Domain:</label>
-            <input tabindex="1" type="text" id="Domain"  name="Domain" value="{{Domain}}">
+            <input tabindex="1" type="text" id="Domain"  name="Domain">
             <label for="Subdomain">Subdomain:</label>
-            <input tabindex="2" type="text" id="Subdomain" name="Subdomain" value="{{Subdomain}}">
+            <input tabindex="2" type="text" id="Subdomain" name="Subdomain">
             <label for="Topic">Topic:</label>
-            <input tabindex="3" type="text" id="Topic" name="Topic" value="{{Topic}}">
+            <input tabindex="3" type="text" id="Topic" name="Topic">
             <label for="QuizletURL">Quizlet URL:</label>
             <input autofocus tabindex="4" type="text" id="QuizletURL" name="QuizletURL">
             <input tabindex="0" type="submit" value="Submit">
         </form>
-        <hi>{{inserted_ok}}</h1>
+        <h1>{{inserted_ok}}</h1>
     </body>
 </html>

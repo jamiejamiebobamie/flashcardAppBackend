@@ -76,7 +76,6 @@ def add_card_to_db(Domain,Subdomain,Topic,front,back):
     }
     return_document = cardstacks.insert_one(new_document)
     inserted_ok = return_document.acknowledged
-
     return inserted_ok
 
 @app.route('/add',methods=['POST'])
@@ -133,7 +132,10 @@ def get_flashcards():
                                      len(Subdomain) and
                                      len(Topic) and
                                      len(url))
+        inserted_ok = False
         if all_fields_contain_content:
+            db = mongo.db
+            cardstacks = db.cardstacks
             s = requests.Session()
             print(url)
             headers = {
@@ -150,8 +152,8 @@ def get_flashcards():
 
             terms_defs = soup.findAll("span", {"class": "TermText notranslate lang-en"})
 
-            flashcard = []
-            insertion_statuses = []
+            flashcard_documents = []
+            front = None
             if terms_defs:
                 for i in range(len(terms_defs)):
                     terms_defs[i] = terms_defs[i].prettify()
@@ -161,20 +163,26 @@ def get_flashcards():
                         content = [c for c in content if c != ' <br/>']
                     content = "".join(content)
                     # print(content)
-                    if not len(flashcard):
+                    if not front:
                         # need to do more testing, but it appears there is a leading
                             # space in front of the terms and definitions that needs
                             # to be stripped.
-                        flashcard.append(content[1:])
+                        front = content[1:]
                     else:
-                        front = flashcard[0]
                         # strip the leading space.
                         back = content[1:]
-                        print(Domain,Subdomain,Topic,front,back)
-                        inserted_ok = add_card_to_db(Domain,Subdomain,Topic,front,back)
-                        insertion_statuses.append(inserted_ok)
-                        flashcard = []
-        return render_template('quizlet.html', inserted_ok=all(insertion_statuses))
+                        # print(Domain,Subdomain,Topic,front,back)
+                        new_document = {
+                                "Domain" : Domain,
+                                "Subdomain" : Subdomain,
+                                "Topic" : Topic,
+                                "front" : front,
+                                "back" : back
+                            }
+                        flashcard_documents.append(new_document)
+                        front = None
+                inserted_ok = cardstacks.insert_many(flashcard_documents).acknowledged
+        return render_template('quizlet.html', inserted_ok=inserted_ok)
     else:
         return render_template('login.html')
 
