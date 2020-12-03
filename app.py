@@ -153,7 +153,9 @@ def get_flashcards():
 
             flashcard_documents = []
             front = None
+            print('test')
             if terms_defs:
+                print('test2')
                 for i in range(len(terms_defs)):
                     terms_defs[i] = terms_defs[i].prettify()
                     # grab the content between the <span></span> tags
