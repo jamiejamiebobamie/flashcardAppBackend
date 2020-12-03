@@ -180,7 +180,8 @@ def get_flashcards():
                             }
                         flashcard_documents.append(new_document)
                         front = None
-                print(flashcard_documents)
+                print(url)
+                print(flashcard_documents[0])
                 inserted_ok = cardstacks.insert_many(flashcard_documents).acknowledged
         return render_template('quizlet.html', inserted_ok=inserted_ok)
     else:
