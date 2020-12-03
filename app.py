@@ -137,7 +137,6 @@ def get_flashcards():
             db = mongo.db
             cardstacks = db.cardstacks
             s = requests.Session()
-            print(url)
             headers = {
                 'User-Agent': 'My User Agent 1.0',
                 'From': 'youremail@domain.com'  # This is another valid field
@@ -181,6 +180,7 @@ def get_flashcards():
                             }
                         flashcard_documents.append(new_document)
                         front = None
+                print(flashcard_documents)
                 inserted_ok = cardstacks.insert_many(flashcard_documents).acknowledged
         return render_template('quizlet.html', inserted_ok=inserted_ok)
     else:
