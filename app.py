@@ -176,16 +176,13 @@ def get_flashcards():
     else:
         return render_template('login.html')
 
-
-# web scrape quizlet.com
-# must log in first and copy the url path of the flashcards you want.
-@app.route('/deleteStack',methods=['DELETE'])
-def quizlet_url_form():
-    is_logged_in = request.cookies.get('loggedin?')
-    if is_logged_in == str(os.environ.get('is_logged_in')):
-        return render_template('quizlet.html')
-    else:
-        return render_template('login.html')
+# @app.route('/deleteStack',methods=['DELETE'])
+# def delete_cardstack():
+#     is_logged_in = request.cookies.get('loggedin?')
+#     if is_logged_in == str(os.environ.get('is_logged_in')):
+#         return render_template('quizlet.html')
+#     else:
+#         return render_template('login.html')
 
 @app.route('/api/v1/cards',methods=['POST'])
 def query_cards():
