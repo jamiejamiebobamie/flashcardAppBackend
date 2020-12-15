@@ -339,13 +339,7 @@ def flag_card():
     return { "success": "ok" }
 
 
-# if __name__ == '__main__':
-    # port = os.getenv("PORT", 7000)
+if __name__ == '__main__':
+    port = os.getenv("PORT", 7000)
     # app.run(host = '0.0.0.0', port = int(port), debug=True)
-    # app.run() # might need this if heroku doesn't want me to specify the port.
-
-
-if __name__ != '__main__':
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
+    app.run() # might need this if heroku doesn't want me to specify the port.
