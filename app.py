@@ -72,7 +72,8 @@ def add_card_to_db(Domain,Subdomain,Topic,front,back):
         "Subdomain" : Subdomain,
         "Topic" : Topic,
         "front" : front,
-        "back" : back
+        "back" : back,
+        "flagged" : 'false'
     }
     return_document = cardstacks.insert_one(new_document)
     inserted_ok = return_document.acknowledged
@@ -106,6 +107,13 @@ def add_card():
     else:
         return render_template('login.html')
 
+# temporary route to update db with the 'flagged' boolean.
+# @app.route('/update-db')
+# def add_flagged():
+#     db = mongo.db
+#     cardstacks = db.cardstacks
+#     success = cardstacks.update_many( {}, {  "$set": { "flagged": "false"}  }).acknowledged
+#     return {"success":success}
 
 # web scrape quizlet.com
 # must log in first and copy the url path of the flashcards you want.
@@ -141,10 +149,8 @@ def get_flashcards():
                 'User-Agent': 'My User Agent 1.0',
                 'From': 'youremail@domain.com'  # This is another valid field
             }
-            cookies = parse_cookies()
-            for k,v in cookies.items():
-                s.cookies.set(k,v)
-            page = s.get(url,headers=headers, cookies=cookies)
+            # this route only works locally...
+            page = s.get(url, headers=headers)
             soup = BeautifulSoup(page.content, 'html.parser')
             """
             FROM QUIZLET:
@@ -181,7 +187,8 @@ def get_flashcards():
                                 "Subdomain" : Subdomain,
                                 "Topic" : Topic,
                                 "front" : front,
-                                "back" : back
+                                "back" : back,
+                                "flagged" : 'false'
                             }
                         flashcard_documents.append(new_document)
                         front = None
@@ -256,7 +263,8 @@ def query_cards():
                         "Subdomain" : card["Subdomain"],
                         "Topic" : card["Topic"],
                         "front" : card["front"],
-                        "back" : card["back"]
+                        "back" : card["back"],
+                        "flagged" : card["flagged"],
                         }
                 # add the new card object to the filtered_cards array
                 filtered_cards.append(card)
