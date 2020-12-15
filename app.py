@@ -73,7 +73,7 @@ def add_card_to_db(Domain,Subdomain,Topic,front,back):
         "Topic" : Topic,
         "front" : front,
         "back" : back,
-        "flagged" : 'false'
+        "flagged" : "false"
     }
     return_document = cardstacks.insert_one(new_document)
     inserted_ok = return_document.acknowledged
@@ -188,7 +188,7 @@ def get_flashcards():
                                 "Topic" : Topic,
                                 "front" : front,
                                 "back" : back,
-                                "flagged" : 'false'
+                                "flagged" : "false"
                             }
                         flashcard_documents.append(new_document)
                         front = None
@@ -264,7 +264,7 @@ def query_cards():
                         "Topic" : card["Topic"],
                         "front" : card["front"],
                         "back" : card["back"],
-                        "flagged" : card["flagged"],
+                        "flagged" : card["flagged"]
                         }
                 # add the new card object to the filtered_cards array
                 filtered_cards.append(card)
