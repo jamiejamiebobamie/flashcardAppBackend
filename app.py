@@ -312,16 +312,21 @@ def flag_card():
         flagged = "true"
     else:
         flagged = "false"
-    card = cardstacks.find_one({
+    # card = cardstacks.find_one({
+    #     "Domain":flagged_card_data["Domain"],
+    #     "Subdomain":flagged_card_data["Subdomain"],
+    #     "Topic":flagged_card_data["Topic"],
+    #     "front":flagged_card_data["front"],
+    #     })
+    # success = False
+    # if card:
+    #     print(card)
+    success = cardstacks.update_one( {
         "Domain":flagged_card_data["Domain"],
         "Subdomain":flagged_card_data["Subdomain"],
         "Topic":flagged_card_data["Topic"],
         "front":flagged_card_data["front"],
-        })
-    success = False
-    if card:
-        print('found')
-        success = cardstacks.update_one( {card}, {  "$set": { "flagged": flagged }  }).acknowledged
+        }, {  "$set": { "flagged": flagged }  }).acknowledged
     return { "success": success }
 
 
