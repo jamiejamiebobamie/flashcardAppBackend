@@ -303,40 +303,26 @@ def query_tabs():
 
 @app.route('/api/v1/flagged', methods=['POST'])
 def flag_card():
-    # db = mongo.db
-    # cardstacks = db.cardstacks
+    db = mongo.db
+    cardstacks = db.cardstacks
 
     flagged_card_data = request.get_json()
-    print(flagged_card_data)
-    # filtered_cards = []
-    # # iterate through the subject_data
-    # for string in flagged_card_data:
-    #     # each subject_data entry is a string separated by '*' of:
-    #     # 'Domain*Subdomain*Topic'
-    #     terms_to_match = string.split("*")
-    #     cards = cardstacks.find({
-    #         "Domain":terms_to_match[0],
-    #         "Subdomain":terms_to_match[1],
-    #         "Topic":terms_to_match[2],
-    #         })
-    #     if cards:
-    #         for card in cards:
-    #             # probably a better way to do this, but create a new card object
-    #                 # that does not contain the object id from the database
-    #                 # as this throws an error when returning the filtered_cards
-    #                 # as JSON.
-    #             card = {
-    #                     "Domain" : card["Domain"],
-    #                     "Subdomain" : card["Subdomain"],
-    #                     "Topic" : card["Topic"],
-    #                     "front" : card["front"],
-    #                     "back" : card["back"],
-    #                     "flagged" : card["flagged"]
-    #                     }
-    #             # add the new card object to the filtered_cards array
-    #             filtered_cards.append(card)
-    # return the filtered cards to the frontend.
-    return { "success": "ok" }
+
+    if flagged_card_data["flagged"] == True:
+        flagged = "true"
+    else:
+        flagged = "false"
+    card = cardstacks.find_one({
+        "Domain":flagged_card_data["Domain"],
+        "Subdomain":flagged_card_data["Subdomain"],
+        "Topic":flagged_card_data["Topic"],
+        "front":flagged_card_data["front"],
+        })
+    success = False
+    if card:
+        print('found')
+        success = cardstacks.update_one( {card}, {  "$set": { "flagged": flagged }  }).acknowledged
+    return { "success": success }
 
 
 if __name__ == '__main__':
